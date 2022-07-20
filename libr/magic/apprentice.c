@@ -70,10 +70,10 @@ struct r_magic_entry {
 	ut32 max_count;
 };
 
-static int magic_file_formats[FILE_NAMES_SIZE];
-static const size_t file_nformats = FILE_NAMES_SIZE;
-static const char *magic_file_names[FILE_NAMES_SIZE];
-static const size_t file_nnames = FILE_NAMES_SIZE;
+static R_TH_LOCAL int magic_file_formats[FILE_NAMES_SIZE];
+static R_TH_LOCAL const size_t file_nformats = FILE_NAMES_SIZE;
+static R_TH_LOCAL const char *magic_file_names[FILE_NAMES_SIZE];
+static R_TH_LOCAL const size_t file_nnames = FILE_NAMES_SIZE;
 
 static int getvalue(RMagic *ms, struct r_magic *, const char **, int);
 static int hextoint(int);
@@ -169,13 +169,8 @@ static int get_type(const char *l, const char **t) {
 	return p->type;
 }
 
-static void init_file_tables(void) {
-	static R_TH_LOCAL bool done = false;
+void init_file_tables(void) {
 	const struct type_tbl_s *p;
-	if (done) {
-		return;
-	}
-	done = true;
 	for (p = type_tbl; p->len; p++) {
 		if (p->type >= FILE_NAMES_SIZE) {
 			continue;
@@ -272,12 +267,11 @@ void file_delmagic(struct r_magic *p, int type, size_t entries) {
 }
 
 /* const char *fn: list of magic files and directories */
-struct mlist * file_apprentice(RMagic *ms, const char *fn, size_t fn_size, int action) {
+struct mlist *file_apprentice(RMagic *ms, const char *fn, size_t fn_size, int action) {
 	char *p, *mfn;
 	int file_err, errs = -1;
 	struct mlist *mlist;
 
-	init_file_tables ();
 	if (!fn) {
 		return NULL;
 	}
